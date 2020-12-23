@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Users</title>
+</head>
+<body>
+<div th:if="${error != null}">
+    <p th:text = "${error}">VALUE</p>
+</div>
+<form th:method ="POST" th:action = "@{/registration}" th:object="${user}">
+    <div>
+        <label for="username">username</label>
+        <input type="text" th:field="*{username}" id="username"/>
+
+        <br>
+
+        <label for="password">password</label>
+        <input type="password" th:field="*{password}" id="password"/>
+
+        <br>
+
+        <label for="lastname">lastname</label>
+        <input type="text" th:field="*{lastname}" id="lastname"/>
+
+        <br>
+        <label for="email">email</label>
+        <input type="email" th:field="*{email}" id="email"/>
+
+        <br>
+
+        <input type="submit" value = "Add User"/>
+    </div>
+</form>
+</body>
+</html>

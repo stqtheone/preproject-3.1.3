@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p th:text = "${user.getId()}">VALUE</p>
+<p th:text = "${user.getUsername()}">VALUE</p>
+<p th:text = "${user.getLastname()}">VALUE</p>
+<p th:text = "${user.getEmail()}">VALUE</p>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+</body>
+</html>

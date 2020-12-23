@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:method="POST" th:action="@{/admin/users/{id}(id=${user.getId()})}" th:object="${user}">
+    <div>
+        <label for="username" >Name</label>
+        <input type="text" th:field="*{username}" id="username" readonly/>
+
+        <br>
+        <label for="password">Password</label>
+        <input type="password" th:field="*{password}" id="password"/>
+
+        <br>
+
+        <label for="lastname">Last Name</label>
+        <input type="text" th:field="*{lastname}" id="lastname"/>
+
+        <br>
+
+        <label for="email">Email</label>
+        <input type="text" th:field="*{email}" id="email"/>
+
+        <br>
+
+        <input type="submit" value="Update"/>
+    </div>
+</form>
+
+</body>
+</html>
