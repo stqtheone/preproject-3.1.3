@@ -20,21 +20,21 @@ public class UserController {
     public String main(Model model) {
         return "main";
     }
-//    @GetMapping("/registration")
-//    public String registration(Model model) {
-//        model.addAttribute("user", new User());
-//        return "registration";
+////    @GetMapping("/registration")
+////    public String registration(Model model) {
+////        model.addAttribute("user", new User());
+////        return "registration";
+////    }
+////    @PostMapping("/registration")
+////    public String registrationUser(@ModelAttribute("user") User user, Model model) {
+//////        if(userServiceImpl.loadUserByUsername(user.getUsername()) == null){
+////            userServiceImpl.addUser(user);
+////            return "redirect:/login";
+//////        } else{
+//////            model.addAttribute("error","Username is already use");
+//////            return "registration";
+//////        }
 //    }
-//    @PostMapping("/registration")
-//    public String registrationUser(@ModelAttribute("user") User user, Model model) {
-////        if(userServiceImpl.loadUserByUsername(user.getUsername()) == null){
-//            userServiceImpl.addUser(user);
-//            return "redirect:/login";
-////        } else{
-////            model.addAttribute("error","Username is already use");
-////            return "registration";
-////        }
-    }
     @GetMapping("/admin/users")
     public String showAll(Model model) {
         model.addAttribute("users", userServiceImpl.getAll());
