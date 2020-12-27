@@ -12,7 +12,10 @@
 </head>
 <body>
 
-
+<div th:if="${param.error}">
+    Invalid username and password.
+    <p th:text = "${param.error}">VALUE</p>
+</div>
 <div class="container-fluid h-50">
     <div class="row justify-content-center align-items-center h-100">
         <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">

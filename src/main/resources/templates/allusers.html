@@ -11,10 +11,13 @@
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="margin-left: 27px;">User gub97@mail.ru</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="margin-left: 27px;" th:text = "${user.getEmail() + ' WITH ROLES ' + user.getRoles()}"></a>
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-            <a class="nav-link" href="#">Sign out</a>
+            <form th:action="@{/logout}" method="post">
+
+                <a class="nav-link" href="#"><input type="submit" value="Sign Out"/></a>
+            </form>
         </li>
     </ul>
 </nav>
@@ -23,17 +26,21 @@
         <nav class="col-sm-2 d-none d-md-block bg-white sidebar" >
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link bg-primary" href="/allusers">
-                            <span class="text-light">Admin</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/springboot/templates/oneuser.html">
-                            <span data-feather="shopping-cart"></span>
-                            User
-                        </a>
-                    </li>
+                    <div sec:authorize="hasRole('ROLE_ADMIN')">
+                        <li class="nav-item">
+                            <a class="nav-link bg-primary" href="/admin/users">
+                                <span class="text-light">Admin</span>
+                            </a>
+                        </li>
+                    </div>
+                    <div sec:authorize="hasAnyRole('ROLE_USER','ROLE_ADMIN')">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/user">
+                                <span data-feather="shopping-cart"></span>
+                                User
+                            </a>
+                        </li>
+                    </div>
                 </ul>
             </div>
         </nav>
@@ -65,103 +72,104 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>sasha</td>
-                                <td>gubanov</td>
-                                <td>gub97@mail.ru</td>
-                                <td>USER ADMIN</td>
-                                <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit">Edit</button></td>
-                                <td><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete">Delete</button></td>
-                            </tr>
+                                <th:block th:each="user : ${users}">
+                                    <tr>
+                                        <td th:text="${user.id}">id</td>
+                                        <td th:text="${user.username}">name</td>
+                                        <td th:text="${user.lastname}">lastname</td>
+                                        <td th:text="${user.email}">email</td>
+                                        <td><span th:each="r: ${user.roles}"><span th:text="${r.name.substring(5) + ' '}"/></span></td>
+                                        <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit" th:attr="data-target='#edit'+${user.id}">
+                                            Edit</button></td>
+                                        <td><button type="submit" class="btn btn-danger" data-toggle="modal" data-target="#delete" th:attr="data-target='#delete'+${user.id}">Delete</button></td>
+                                    </tr>
+                                    <div class="modal fade"  th:id="edit+${user.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLongTitle">Edit user</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form th:method="POST" th:action="@{/admin/users/{id}(id=${user.getId()})}">
+                                                        <div class="form-group justify-content-center" style="margin-top: 20px;">
+                                                            <label for="username">Username</label>
+                                                            <input type="text" class="form-control" name="username" id="username" th:value="${user.username}"/>
+                                                        </div>
+                                                        <div class="form-group" style="margin-top: 20px;">
+                                                            <label for="password">Password</label>
+                                                            <input type="password" class="form-control" name="password" id="password"/>
+                                                        </div>
+                                                        <div class="form-group" style="margin-top: 20px;">
+                                                            <label for="lastname">Last name</label>
+                                                            <input type="text" class="form-control" name="lastname"  id="lastname" th:value="${user.lastname}"/>
+                                                        </div>
+                                                        <div class="form-group" style="margin-top: 20px;">
+                                                            <label for="email">Email</label>
+                                                            <input type="email" class="form-control" name="email" id="email" th:value="${user.email}"/>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="exampleFormControlSelect2">Role</label>
+                                                            <select multiple="true" class="form-control" name="roles" id="exampleFormControlSelect2">
+                                                                <th:block th:each="r : ${user.roles}">
+                                                                    <option th:text="${r.name.substring(5)}"></option>
+                                                                </th:block>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group" style="margin-left: 300px; margin-top: 35px;">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Edit</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal fade" th:id="delete+${user.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLongTitle">Delete user</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form th:method="DELETE" th:action="@{/admin/users/{id}(id=${user.getId()})}">
+                                                        <div class="form-group justify-content-center" style="margin-top: 20px;">
+                                                            <label for="formGroupExampleInput">Username</label>
+                                                            <input type="text" name="username" th:placeholder="*{user.username}" class="form-control" id="formGroupExampleInput" readonly>
+                                                        </div>
+                                                        <div class="form-group" style="margin-top: 20px;">
+                                                            <label for="formGroupExampleInput">Last name</label>
+                                                            <input type="text" class="form-control" th:placeholder="*{user.lastname}" id="formGroupExampleInput" placeholder="Last name" readonly>
+                                                        </div>
+                                                        <div class="form-group" style="margin-top: 20px;">
+                                                            <label for="formGroupExampleInput">Email</label>
+                                                            <input type="email" class="form-control" th:placeholder="*{user.email}" id="formGroupExampleInput" placeholder="Email" readonly>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="exampleFormControlSelect2">Role</label>
+                                                            <select multiple="true" class="form-control" id="exampleFormControlSelect2" disabled>
+                                                                <th:block th:each="r : ${user.roles}">
+                                                                <option th:text="${r.name.substring(5)}"></option>
+                                                                </th:block>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group" style="margin-left: 300px; margin-top: 35px;">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th:block>
                             </tbody>
                         </table>
-                        <div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLongTitle">Edit user</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form>
-                                            <div class="form-group justify-content-center" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput">Username</label>
-                                                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username">
-                                            </div>
-                                            <div class="form-group" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput2">Password</label>
-                                                <input type="password" class="form-control" id="formGroupExampleInput2" placeholder="Password">
-                                            </div>
-                                            <div class="form-group" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput">Last name</label>
-                                                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Last name">
-                                            </div>
-                                            <div class="form-group" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput">Email</label>
-                                                <input type="email" class="form-control" id="formGroupExampleInput" placeholder="Email">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="exampleFormControlSelect2">Role</label>
-                                                <select multiple class="form-control" id="exampleFormControlSelect2">
-                                                    <option>ADMIN</option>
-                                                    <option>USER</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group" style="margin-left: 300px; margin-top: 35px;">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Edit</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal fade" id="delete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLongTitle">Edit user</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form>
-                                            <div class="form-group justify-content-center" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput">Username</label>
-                                                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username" readonly>
-                                            </div>
-                                            <div class="form-group" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput2">Password</label>
-                                                <input type="password" class="form-control" id="formGroupExampleInput2" placeholder="Password" readonly>
-                                            </div>
-                                            <div class="form-group" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput">Last name</label>
-                                                <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Last name" readonly>
-                                            </div>
-                                            <div class="form-group" style="margin-top: 20px;">
-                                                <label for="formGroupExampleInput">Email</label>
-                                                <input type="email" class="form-control" id="formGroupExampleInput" placeholder="Email" readonly>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="exampleFormControlSelect2">Role</label>
-                                                <select multiple class="form-control" id="exampleFormControlSelect2" readonly>
-                                                    <option>ADMIN</option>
-                                                    <option>USER</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group" style="margin-left: 300px; margin-top: 35px;">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="newuser">
@@ -169,28 +177,28 @@
                     <div class="form-control bg-white">
                         <div class="row justify-content-center align-items-center">
                             <div class="col-sm-5">
-                                <form>
+                                <form method="POST" action="/admin/users">
                                     <div class="form-group justify-content-center" style="margin-top: 20px;">
                                         <label for="formGroupExampleInput">Username</label>
-                                        <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Username">
+                                        <input type="text" class="form-control" id="formGroupExampleInput" name="username">
                                     </div>
                                     <div class="form-group" style="margin-top: 20px;">
                                         <label for="formGroupExampleInput2">Password</label>
-                                        <input type="password" class="form-control" id="formGroupExampleInput2" placeholder="Password">
+                                        <input type="password" class="form-control" id="formGroupExampleInput2" name="password">
                                     </div>
                                     <div class="form-group" style="margin-top: 20px;">
                                         <label for="formGroupExampleInput">Last name</label>
-                                        <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Last name">
+                                        <input type="text" class="form-control" id="formGroupExampleInput" name="lastname">
                                     </div>
                                     <div class="form-group" style="margin-top: 20px;">
                                         <label for="formGroupExampleInput">Email</label>
-                                        <input type="email" class="form-control" id="formGroupExampleInput" placeholder="Email">
+                                        <input type="email" class="form-control" id="formGroupExampleInput" name="email">
                                     </div>
                                     <div class="form-group">
                                         <label for="exampleFormControlSelect2">Role</label>
-                                        <select multiple class="form-control" id="exampleFormControlSelect2">
-                                            <option>ADMIN</option>
-                                            <option>USER</option>
+                                        <select multiple="multiple" class="form-control" id="exampleFormControlSelect2" name="roles">
+                                            <option value="ADMIN">ADMIN</option>
+                                            <option value="USER">USER</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin-top: 20px;">

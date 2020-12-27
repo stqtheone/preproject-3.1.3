@@ -11,10 +11,12 @@
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="margin-left: 27px;">User gub97@mail.ru</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="margin-left: 27px;" th:text = "${user.getEmail() + ' WITH ROLES ' + user.getRoles()}"></a>
     <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
-            <a class="nav-link" href="#">Sign out</a>
+            <form th:action="@{/logout}" method="post">
+                <a class="nav-link" href="#"><input type="submit" value="Sign Out"/></a>
+            </form>
         </li>
     </ul>
 </nav>
@@ -23,16 +25,20 @@
         <nav class="col-sm-2 d-none d-md-block bg-white sidebar" >
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/allusers">
-                            <span>Admin</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link  bg-primary" href="/springboot/templates/oneuser.html">
-                            <span class="text-light">User</span>
-                        </a>
-                    </li>
+                    <div sec:authorize="hasRole('ROLE_ADMIN')">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/users">
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                    </div>
+                    <div sec:authorize="hasAnyRole('ROLE_USER','ROLE_ADMIN')">
+                        <li class="nav-item">
+                            <a class="nav-link  bg-primary" href="/user">
+                                <span class="text-light">User</span>
+                            </a>
+                        </li>
+                    </div>
                 </ul>
             </div>
         </nav>

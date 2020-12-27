@@ -9,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 @Controller
 @RequestMapping()
@@ -20,23 +22,10 @@ public class UserController {
     public String main(Model model) {
         return "main";
     }
-////    @GetMapping("/registration")
-////    public String registration(Model model) {
-////        model.addAttribute("user", new User());
-////        return "registration";
-////    }
-////    @PostMapping("/registration")
-////    public String registrationUser(@ModelAttribute("user") User user, Model model) {
-//////        if(userServiceImpl.loadUserByUsername(user.getUsername()) == null){
-////            userServiceImpl.addUser(user);
-////            return "redirect:/login";
-//////        } else{
-//////            model.addAttribute("error","Username is already use");
-//////            return "registration";
-//////        }
-//    }
     @GetMapping("/admin/users")
     public String showAll(Model model) {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        model.addAttribute("user", userServiceImpl.loadUserByUsername(name));
         model.addAttribute("users", userServiceImpl.getAll());
         return "allusers";
     }
@@ -65,15 +54,24 @@ public class UserController {
 
 
     @PostMapping("/admin/users")
-    public String create(@ModelAttribute("user") User user, @ModelAttribute("userRole") String userRole,
-                         @ModelAttribute("adminRole") String adminRole) {
-        user.setRoles(new HashSet<>());
-        if (userRole.equals("on")){
-            user.getRoles().add(new Role(1L, "ROLE_USER"));
+    public String create(@ModelAttribute("username") String username,
+                         @ModelAttribute("password") String password,
+                         @ModelAttribute("lastname") String lastname,
+                         @ModelAttribute("email") String email,
+                         @ModelAttribute("roles") String roles) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setLastname(lastname);
+        user.setEmail(email);
+        System.out.println(roles.toString());
+        HashSet<Role> set = new HashSet<>();
+        if(roles.equals("ADMIN")){
+            set.add(new Role(2L,"ROLE_ADMIN"));
+        } else {
+            set.add(new Role(1L,"ROLE_USER"));
         }
-        if (adminRole.equals("on")){
-            user.getRoles().add(new Role(2L, "ROLE_ADMIN"));
-        }
+        user.setRoles(set);
         userServiceImpl.addUser(user);
         return "redirect:/admin/users";
 
@@ -86,11 +84,17 @@ public class UserController {
     }
 
     @PostMapping("/admin/users/{id}")
-    public String updateUser(@ModelAttribute("user") User user){
-        User defaultUser = userServiceImpl.loadUserByUsername(user.getUsername());
-        user.setRoles(defaultUser.getRoles());
-        userServiceImpl.updateUser(user);
-        System.out.println("POST MAPPING OK");
+    public String updateUser(@ModelAttribute("id") Long id,
+                             @ModelAttribute("username") String username,
+                             @ModelAttribute("password") String password,
+                             @ModelAttribute("lastname") String lastname,
+                             @ModelAttribute("email") String email){
+        User defaultUser = userServiceImpl.getUser(id);
+        defaultUser.setUsername(username);
+        defaultUser.setPassword(password);
+        defaultUser.setLastname(lastname);
+        defaultUser.setEmail(email);
+        userServiceImpl.updateUser(defaultUser);
         return "redirect:/admin/users";
     }
 
