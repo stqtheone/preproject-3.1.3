@@ -1,6 +1,7 @@
 package com.preproject.spring.springboot.security;
 import com.preproject.spring.springboot.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,13 +21,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserServiceImpl userService;
 
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
         http
                 .authorizeRequests()
                     .antMatchers("/registration").not().fullyAuthenticated()
@@ -44,7 +45,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .and()
                     .logout()
-                    .permitAll();
+                    .permitAll()
+                .and()
+                    .csrf().disable().cors();
     }
 
     @Autowired

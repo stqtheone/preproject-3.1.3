@@ -5,6 +5,7 @@ import com.preproject.spring.springboot.dao.UserRepository;
 import com.preproject.spring.springboot.model.Role;
 import com.preproject.spring.springboot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserDetailsService {
     RoleRepository roleRepository;
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+
 
     public void addUser(User user){
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
