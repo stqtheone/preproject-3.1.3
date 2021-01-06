@@ -59,20 +59,21 @@
             $('#newuserbutton').click(function (e) {
                 e.preventDefault();
                 var id = 0;
-                if ($('#addroles').val()[0] === "ROLE_USER") {
-                    id = 1;
-                } else {
-                    id = 2;
+                var roles = [];
+                for(var i = 0; i < $('#addroles').val().length; i++){
+                    if ($('#addroles').val()[i] === "ROLE_USER") {
+                        id = 1;
+                    } else {
+                        id = 2;
+                    }
+                    roles[i] = {id: id, name: $('#addroles').val()[i]} ;
                 }
                 var user = {
                     username: $('#addusername').val(),
                     password: $('#addpassword').val(),
                     lastname: $('#addlastname').val(),
                     email: $('#addemail').val(),
-                    roles: [{
-                        id: id,
-                        name: $('#addroles').val()[0],
-                    }]
+                    roles: roles
                 }
                 $.ajax({
                     url: 'http://localhost:8080/api/admin/users',
@@ -149,7 +150,6 @@
         //-----------------------------------EDIT USER----------------------------------
         $(function () {
             $('#edit').on('show.bs.modal', function (event) {
-                document.querySelector('#editroles').innerHTML = '';
                 var button = $(event.relatedTarget);
                 var id = $(button).data('id');
                 $('form#form_edit input[name=id]').val(id);
@@ -161,23 +161,18 @@
                     var inp = $('form#form_edit input[name=' + name + ']');
                     var opt = $('#editroles[name=' + name + ']');
                     inp.val(value);
-                    if (value.toString().includes("ROLE")) {
-                        var mass = value.toString().split(' ');
-                        for (var i = 0; i < mass.length; i++) {
-                            if (mass[i].trim().length > 0) {
-                                opt.prepend('<option>' + mass[i] + '</option>');
-                            }
-                        }
-
-                    }
                 })
                 $('#editor').click(function (e) {
                     e.preventDefault();
                     var id = 0;
-                    if ($('#addroles').val()[0] === "ROLE_USER") {
-                        id = 1;
-                    } else {
-                        id = 2;
+                    var roles = [];
+                    for(var i = 0; i < $('#editroles').val().length; i++) {
+                        if ($('#editroles').val()[i] === "ROLE_USER") {
+                            id = 1;
+                        } else {
+                            id = 2;
+                        }
+                        roles[i] = {id: id, name: $('#addroles').val()[i]};
                     }
                     var user = {
                         id: $('#editid').val(),
@@ -185,11 +180,7 @@
                         password: $('#editp').val(),
                         lastname: $('#editl').val(),
                         email: $('#editemail').val(),
-                        roles: [{
-                            id: id,
-                            name: $('#editroles').val()[0],
-                        }]
-
+                        roles: roles
                     }
                     $.ajax({
                         url: 'http://localhost:8080/api/admin/users',
@@ -354,6 +345,8 @@
                         <label for="editroles">Role</label>
                         <select multiple="true" class="form-control" name="roles"
                                 id="editroles">
+                            <option>ROLE_USER</option>
+                            <option>ROLE_ADMIN</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin-left: 300px; margin-top: 35px;">
