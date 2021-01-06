@@ -29,14 +29,6 @@ public class RestUserController {
         User user = userServiceImpl.loadUserByUsername(name);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
-//
-//    @GetMapping("/user/{id}")
-//    public User showUser(@PathVariable int id){
-//        User user = userServiceImpl.getUser(id);
-//        return user;
-//    }
-
-
     @RequestMapping(value = "/admin/users", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> addUser(@RequestBody User user){
         HttpHeaders headers = new HttpHeaders();
